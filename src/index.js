@@ -1,3 +1,5 @@
+// Copyright (c) 2021 MintJams Inc. Licensed under MIT License.
+
 import Vue from 'vue';
 
 const version = '1.0.0';
