@@ -2,7 +2,7 @@
 
 import Vue from 'vue';
 
-const version = '1.1.0';
+const version = '1.2.0';
 
 const compatible = (/^2\./).test(Vue.version);
 if (!compatible) {
@@ -741,7 +741,7 @@ const VueValidator = {
 		Vue.mixin({
 			created() {
 				let vm = this;
-				Vue.set(vm, '$validator', new Validator(vm));
+				vm.$validator = new Validator(vm);
 			}
 		});
 
