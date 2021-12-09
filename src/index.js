@@ -2,7 +2,7 @@
 
 import Vue from 'vue';
 
-const version = '1.2.0';
+const version = '1.3.0';
 
 const compatible = (/^2\./).test(Vue.version);
 if (!compatible) {
@@ -713,7 +713,7 @@ const VueValidator = {
 						if (errors.length > 0) {
 							ev.errors = errors;
 						}
-						fn(ev);
+						fn.call(ev.validator, ev);
 					}
 				} catch (ex) {/* ignore */}
 			}
@@ -788,7 +788,7 @@ const VueValidator = {
 							"vnode": vnode,
 							"validator": $validator
 						};
-						fn(ev);
+						fn.call(ev.validator, ev);
 					}
 				} catch (ex) {/* ignore */}
 			},
@@ -819,6 +819,22 @@ const VueValidator = {
 					"vnode": vnode
 				};
 
+				try {
+					let fn = vnode.context.validator.on;
+					if (typeof fn == 'function') {
+						let ev = {
+							'type': 'update',
+							'formName': formName,
+							'fieldName': el.name,
+							'el': el,
+							"binding": binding,
+							"vnode": vnode,
+							"validator": $validator
+						};
+						fn.call(ev.validator, ev);
+					}
+				} catch (ex) {/* ignore */}
+
 				vnode.context.$validator.validate(formName, el.name);
 			},
 			unbind(el, binding, vnode) {
@@ -828,10 +844,27 @@ const VueValidator = {
 						return;
 					}
 
-					delete vnode.context.$validator.vnodes[formName][el.name];
-					if (Object.keys(vnode.context.$validator.vnodes[formName]).length == 0) {
-						delete vnode.context.$validator.vnodes[formName];
+					let $validator = vnode.context.$validator;
+					delete $validator.vnodes[formName][el.name];
+					if (Object.keys($validator.vnodes[formName]).length == 0) {
+						delete $validator.vnodes[formName];
 					}
+
+					try {
+						let fn = vnode.context.validator.on;
+						if (typeof fn == 'function') {
+							let ev = {
+								'type': 'unbind',
+								'formName': formName,
+								'fieldName': el.name,
+								'el': el,
+								"binding": binding,
+								"vnode": vnode,
+								"validator": $validator
+							};
+							fn.call(ev.validator, ev);
+						}
+					} catch (ex) {/* ignore */}
 				} catch (ex) {/* ignore */}
 			}
 		});
